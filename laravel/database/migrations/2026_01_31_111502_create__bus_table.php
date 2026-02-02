@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('_bus', function (Blueprint $table) {
+        Schema::create('bus', function (Blueprint $table) {
             $table->id();
             $table->string('matricule')->unique();
             $table->integer('capacite');

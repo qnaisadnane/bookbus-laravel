@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('_programme', function (Blueprint $table) {
+        Schema::create('programme', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_route')->constrained('route')->onDelete('cascade');
+            $table->foreignId('id_segment')->constrained('segment')->onDelete('cascade');
             $table->string('jour_depart');
             $table->time('heure_depart');
             $table->time('heure_arrivee');

@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('_etape', function (Blueprint $table) {
+        Schema::create('etape', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_gare')->constrained('gare')->onDelete('cascade');
+            $table->foreignId('id_segment')->constrained('segment')->onDelete('cascade');
+            $table->foreignId('id_route')->constrained('route')->onDelete('cascade');
             $table->int('ordre');
             $table->time('heure_passage');
             $table->timestamps();

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('segments', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_bus')->constrained('bus')->onDelete('cascade');
             $table->decimal('tarif', 8, 2);
            $table->int('distance_km');
             $table->timestamps();
