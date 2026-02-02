@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('segments', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; 
             $table->id();
             $table->foreignId('id_bus')->constrained('bus')->onDelete('cascade');
             $table->decimal('tarif', 8, 2);
-           $table->int('distance_km');
+            $table->integer('distance_km');
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('_segment');
+        Schema::dropIfExists('segments');
     }
 };

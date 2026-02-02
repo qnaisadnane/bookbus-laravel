@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('etape', function (Blueprint $table) {
+        Schema::create('programmes', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; 
             $table->id();
-            $table->foreignId('id_gare')->constrained('gare')->onDelete('cascade');
-            $table->foreignId('id_segment')->constrained('segment')->onDelete('cascade');
             $table->foreignId('id_route')->constrained('route')->onDelete('cascade');
-            $table->int('ordre');
-            $table->time('heure_passage');
+            $table->foreignId('segment_id')->constrained('segments')->onDelete('cascade');
+            $table->string('jour_depart');
+            $table->time('heure_depart');
+            $table->time('heure_arrivee');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('_etape');
+        Schema::dropIfExists('programmes');
     }
 };

@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('garre', function (Blueprint $table) {
-            $table->id();
+        Schema::create('gares', function (Blueprint $table) {
+            $table->engine = 'InnoDB'; 
+            $table->unsignedBigInteger('id', true); 
             $table->string('nom');
             $table->string('adresse');
             $table->foreignId('id_ville')->constrained('ville')->onDelete('cascade');
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('_garre');
+        Schema::dropIfExists('gares');
     }
 };
