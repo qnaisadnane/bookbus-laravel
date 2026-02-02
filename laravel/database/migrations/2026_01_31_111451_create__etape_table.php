@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('_etape', function (Blueprint $table) {
             $table->id();
+            $table->int('ordre');
+            $table->time('heure_passage');
             $table->timestamps();
         });
     }

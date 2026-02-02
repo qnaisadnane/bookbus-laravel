@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('_programme', function (Blueprint $table) {
             $table->id();
+            $table->string('jour_depart');
+            $table->time('heure_depart');
+            $table->time('heure_arrivee');
             $table->timestamps();
         });
     }

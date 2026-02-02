@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('_garre', function (Blueprint $table) {
             $table->id();
+            $table->string('nom');
+            $table->string('adresse');
             $table->timestamps();
         });
     }

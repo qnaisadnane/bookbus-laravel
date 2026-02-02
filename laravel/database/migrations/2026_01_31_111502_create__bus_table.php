@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('_bus', function (Blueprint $table) {
             $table->id();
+            $table->string('matricule')->unique();
+            $table->integer('capacite');
             $table->timestamps();
         });
     }

@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('_segment', function (Blueprint $table) {
+        Schema::create('segments', function (Blueprint $table) {
             $table->id();
+            $table->decimal('tarif', 8, 2);
+           $table->int('distance_km');
             $table->timestamps();
         });
     }
