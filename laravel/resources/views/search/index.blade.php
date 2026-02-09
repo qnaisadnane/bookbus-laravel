@@ -1,50 +1,74 @@
 ﻿@extends('layouts.app')
 
-@section('title', 'Réservez votre billet - BookBus Maroc')
+@section('title', 'Réservez votre billet - SATAS')
 
 @section('content')
-<div class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-    <div class="w-full max-w-6xl">
-        
-        <!-- Navbar Placeholder (Visual only) -->
-        <div class="absolute top-0 left-0 w-full p-6 flex justify-between items-center bg-white/50 backdrop-blur-sm border-b border-slate-200">
-            <div class="text-xl font-bold text-blue-900 flex items-center gap-2">
-                <i class="bi bi-bus-front-fill text-blue-600"></i> BookBus
-            </div>
-            <div class="text-sm text-slate-500">Service Client: <span class="font-semibold text-slate-700">+212 522 000 000</span></div>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-12 items-center mt-16 md:mt-0">
-            <!-- Left Side: Text -->
-            <div class="space-y-6 text-center md:text-left">
-                <div class="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full mb-2">
-                    Nouveau : Lignes Express disponibles
+<div class="min-h-screen bg-slate-50 flex flex-col font-sans">
+    
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{{ route('home') }}" class="flex items-center gap-2">
+                        <div class="bg-blue-600 text-white p-2 rounded-lg">
+                            <i class="bi bi-bus-front-fill text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-black text-blue-900 tracking-tight">SATAS</span>
+                    </a>
                 </div>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Accueil</a>
+                    <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Nos Lignes</a>
+                    <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Agences</a>
+                    <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Contact</a>
+                    <a href="#" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-200">
+                        Mon Compte
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button class="text-slate-500 hover:text-blue-600 focus:outline-none">
+                        <i class="bi bi-list text-3xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Content -->
+    <div class="flex-grow flex items-center justify-center p-4 md:p-8">
+        <div class="w-full max-w-6xl grid md:grid-cols-2 gap-12 items-center">
+            
+            <!-- Left Side: Text -->
+            <div class="space-y-6 text-center md:text-left animate-fade-in-up">
                 <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 leading-tight">
-                    Voyagez à travers le <span class="text-blue-600">Maroc</span> en toute sérénité.
+                    Voyagez à travers le <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">Maroc</span> en toute sécurité.
                 </h1>
-                <p class="text-lg text-slate-600 max-w-lg mx-auto md:mx-0">
-                    Réservez vos billets de bus en quelques clics avec SATAS. Confort, sécurité et ponctualité garantis.
+                <p class="text-lg text-slate-600 max-w-lg mx-auto md:mx-0 leading-relaxed">
+                    SATAS vous accompagne depuis des années. Profitez d'un confort optimal et d'un service ponctuel pour tous vos déplacements.
                 </p>
-                <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                    <div class="flex items-center gap-2 text-slate-700 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
-                        <i class="bi bi-wifi text-blue-500"></i> Wifi Gratuit
-                    </div>
-                    <div class="flex items-center gap-2 text-slate-700 bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm">
-                        <i class="bi bi-雪 text-blue-500"></i> Climatisation
-                    </div>
+                
+                <div class="pt-4 flex justify-center md:justify-start gap-4">
+                    <a href="#search-form" class="hidden md:inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                        Voir nos destinations <i class="bi bi-arrow-right"></i>
+                    </a>
                 </div>
             </div>
 
             <!-- Right Side: Search Form -->
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800">Où allez-vous ?</h2>
-                    <p class="text-slate-500">Comparez les prix et les horaires instantanément.</p>
+            <div id="search-form" class="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 transform transition-all hover:shadow-2xl">
+                <div class="mb-6 border-b border-slate-100 pb-4">
+                    <h2 class="text-2xl font-bold text-slate-800">Réservez votre place</h2>
+                    <p class="text-slate-500 text-sm">Simple, Rapide et Sécurisé.</p>
                 </div>
 
                 @if ($errors->any())
-                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r">
                         <div class="flex">
                             <div class="flex-shrink-0">
                                 <i class="bi bi-exclamation-circle text-red-500"></i>
@@ -64,16 +88,20 @@
                     
                     <!-- Cities Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
-                        <!-- Swap Button Absolute -->
-                        <button type="button" onclick="swapCities()" class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white border border-slate-200 rounded-full shadow-md z-10 flex items-center justify-center text-blue-600 hover:text-blue-800 hover:shadow-lg transition-all md:flex hidden" title="Inverser">
-                            <i class="bi bi-arrow-left-right"></i>
-                        </button>
+                        <!-- Swap Button -->
+                        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 hidden md:block">
+                            <button type="button" onclick="swapCities()" class="w-10 h-10 bg-white border border-slate-200 rounded-full shadow hover:shadow-md flex items-center justify-center text-blue-600 transition-transform hover:rotate-180" title="Inverser">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </button>
+                        </div>
                         
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Départ</label>
-                            <div class="relative">
-                                <i class="bi bi-geo-alt absolute left-3 top-3.5 text-slate-400"></i>
-                                <select name="ville_depart" id="ville_depart" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors appearance-none cursor-pointer" required>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Départ</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="bi bi-geo-alt text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                                </div>
+                                <select name="ville_depart" id="ville_depart" class="block w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all appearance-none cursor-pointer font-medium" required>
                                     <option value="" class="text-slate-400">Ville de départ</option>
                                     @foreach($villes as $ville)
                                         <option value="{{ $ville->id }}" {{ old('ville_depart') == $ville->id ? 'selected' : '' }}>
@@ -84,11 +112,13 @@
                             </div>
                         </div>
 
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Arrivée</label>
-                            <div class="relative">
-                                <i class="bi bi-pin-map absolute left-3 top-3.5 text-slate-400"></i>
-                                <select name="ville_arrivee" id="ville_arrivee" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors appearance-none cursor-pointer" required>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Arrivée</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="bi bi-pin-map text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                                </div>
+                                <select name="ville_arrivee" id="ville_arrivee" class="block w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all appearance-none cursor-pointer font-medium" required>
                                     <option value="" class="text-slate-400">Ville d'arrivée</option>
                                     @foreach($villes as $ville)
                                         <option value="{{ $ville->id }}" {{ old('ville_arrivee') == $ville->id ? 'selected' : '' }}>
@@ -101,49 +131,61 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Date</label>
-                            <div class="relative">
-                                <i class="bi bi-calendar4 absolute left-3 top-3.5 text-slate-400"></i>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Date</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="bi bi-calendar4 text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                                </div>
                                 <input type="date" name="date_depart" id="date_depart" 
                                        value="{{ old('date_depart', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}"
-                                       class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors" required>
+                                       class="block w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all font-medium" required>
                             </div>
                         </div>
 
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Voyageurs</label>
-                            <div class="relative">
-                                <i class="bi bi-people absolute left-3 top-3.5 text-slate-400"></i>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide ml-1">Voyageurs</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="bi bi-people text-slate-400 group-focus-within:text-blue-500 transition-colors"></i>
+                                </div>
                                 <input type="number" name="nombre_voyageurs" id="nombre_voyageurs" 
                                        value="{{ old('nombre_voyageurs', 1) }}" min="1" max="10"
-                                       class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-colors" required>
+                                       class="block w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition-all font-medium" required>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Class Selection - Simplified -->
-                    <div class="flex gap-4 p-1 bg-slate-100/50 rounded-lg">
+                    <!-- Class Selection - Modern Pills -->
+                    <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-100 flex">
                         <label class="flex-1 cursor-pointer">
                             <input type="radio" name="classe_bus" value="standard" class="peer sr-only" checked>
-                            <div class="text-center py-2 rounded-md text-sm font-medium text-slate-600 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all hover:text-blue-500">Standard</div>
+                            <div class="text-center py-2.5 rounded-lg text-sm font-semibold text-slate-500 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all">Standard</div>
                         </label>
                         <label class="flex-1 cursor-pointer">
                             <input type="radio" name="classe_bus" value="confort" class="peer sr-only">
-                            <div class="text-center py-2 rounded-md text-sm font-medium text-slate-600 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all hover:text-blue-500">Confort</div>
+                            <div class="text-center py-2.5 rounded-lg text-sm font-semibold text-slate-500 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all">Confort</div>
                         </label>
                         <label class="flex-1 cursor-pointer">
                             <input type="radio" name="classe_bus" value="premium" class="peer sr-only">
-                            <div class="text-center py-2 rounded-md text-sm font-medium text-slate-600 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all hover:text-blue-500">Premium</div>
+                            <div class="text-center py-2.5 rounded-lg text-sm font-semibold text-slate-500 peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all flex justify-center items-center gap-1">
+                                Premium 
+                            </div>
                         </label>
                     </div>
 
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all transform hover:-translate-y-0.5 focus:ring-4 focus:ring-blue-200">
-                        Rechercher
+                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-lg flex justify-center items-center gap-2">
+                        <i class="bi bi-search"></i> Rechercher
                     </button>
-                    
                 </form>
             </div>
+        </div>
+    </div>
+    
+    <!-- Footer Simple -->
+    <div class="bg-white border-t border-slate-100 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-slate-400 text-sm">
+            &copy; {{ date('Y') }} SATAS Maroc. Tous droits réservés.
         </div>
     </div>
 </div>
@@ -159,4 +201,13 @@
         arrivee.value = temp;
     }
 </script>
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up {
+        animation: fadeInUp 0.8s ease-out;
+    }
+</style>
 @endpush

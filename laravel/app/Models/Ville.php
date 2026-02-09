@@ -2,19 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ville extends Model
 {
-    protected $fillable = [
-        'jour_depart',
-        'heure_depart',
-        'heure_arrivee',];
+    use HasFactory;
 
-    public function segment(){
-        return $this->belongTo(Segment::class);
-    }
-    public function route(){
-        return $this->belongTo(Route::class);
+    protected $table = 'ville';
+
+    protected $fillable = [
+        'name',
+    ];
+
+    /**
+     * Get all stations in this city
+     */
+    public function stations(): HasMany
+    {
+        return $this->hasMany(Station::class, 'city_id');
     }
 }

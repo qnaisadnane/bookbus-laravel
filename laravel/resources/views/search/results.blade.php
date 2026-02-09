@@ -30,7 +30,7 @@
                     </div>
                 </div>
 
-                <a href="{{ route('search.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline">
+                <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline">
                     Modifier la recherche
                 </a>
             </div>
@@ -108,7 +108,7 @@
                     @foreach($trajets as $trajet)
                         <div class="trajet-card bg-white border border-slate-200 rounded-xl hover:shadow-md transition-shadow duration-200 overflow-hidden"
                              data-prix-base="{{ $trajet->fare }}"
-                             data-heure-depart="{{ \Carbon\Carbon::parse($trajet->heure_depart_stop)->format('H') }}"
+                             data-heure-depart="{{ \Carbon\Carbon::parse($trajet->departure_time)->format('H') }}"
                              data-duree="{{ $trajet->duree_minutes }}">
                             
                             <div class="p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
@@ -128,7 +128,7 @@
                                 <div class="md:col-span-6 flex items-center justify-between px-4 md:px-8 border-l-0 md:border-l border-r-0 md:border-r border-slate-100">
                                     <div class="text-center">
                                         <div class="text-xl font-bold text-slate-900">
-                                            {{ \Carbon\Carbon::parse($trajet->heure_depart_stop)->format('H:i') }}
+                                            {{ \Carbon\Carbon::parse($trajet->departure_time)->format('H:i') }}
                                         </div>
                                         <div class="text-xs text-slate-500">Départ</div>
                                     </div>
@@ -146,7 +146,7 @@
 
                                     <div class="text-center">
                                         <div class="text-xl font-bold text-slate-900">
-                                            {{ \Carbon\Carbon::parse($trajet->heure_arrivee_stop)->format('H:i') }}
+                                            {{ \Carbon\Carbon::parse($trajet->arrival_time)->format('H:i') }}
                                         </div>
                                         <div class="text-xs text-slate-500">Arrivée</div>
                                     </div>
@@ -213,7 +213,7 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route('search.index') }}" class="inline-flex items-center px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
+                            <a href="{{ route('home') }}" class="inline-flex items-center px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
                                 Touvelle recherche
                             </a>
                         @endif

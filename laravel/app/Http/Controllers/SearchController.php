@@ -2,20 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\SearchService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class SearchController extends Controller
 {
+    public function __construct(
+        protected SearchService $searchService
+    ) {}
+
     /**
      * Afficher le formulaire de recherche (Route GET)
      */
-    public function index()
+    public function index(): View
     {
         // Récupérer uniquement les villes qui ont des gares SATAS
         $villes = DB::table('ville')
-            ->join('gares', 'ville.id', '=', 'gares.id_ville')
+            ->join('stations', 'ville.id', '=', 'stations.city_id')
             ->select('ville.id', 'ville.name')
             ->distinct()
             ->orderBy('ville.name') // Ordre alphabétique
@@ -69,6 +75,8 @@ class SearchController extends Controller
             $nombreVoyageurs
         );
 
+        \Illuminate\Support\Facades\Log::info("SEARCH DEBUG: Dep=$villeDepart, Arr=$villeArrivee, Date=$dateDepart, Count=" . $trajets->count());
+
         // ÉTAPE 3 : Appliquer les filtres
         $trajets = $this->appliquerFiltres($trajets, $request);
 
@@ -108,70 +116,137 @@ class SearchController extends Controller
      */
     private function rechercherTrajets($villeDepart, $villeArrivee, $dateDepart, $nombreVoyageurs)
     {
-        // Récupérer les gares (stops) de départ et d'arrivée
-        $gareDepart = DB::table('gares')->where('id_ville', $villeDepart)->first();
-        $gareArrivee = DB::table('gares')->where('id_ville', $villeArrivee)->first();
+        // Get departure and arrival stations
+        $departureStation = DB::table('stations')->where('city_id', $villeDepart)->first();
+        $arrivalStation = DB::table('stations')->where('city_id', $villeArrivee)->first();
 
-        if (!$gareDepart || !$gareArrivee) {
+        if (!$departureStation || !$arrivalStation) {
+            \Illuminate\Support\Facades\Log::info("SEARCH ERROR: Stations not found for Cities $villeDepart, $villeArrivee");
             return collect();
         }
 
-        // Rechercher les routes qui passent par ces deux gares
-        // Un segment relie deux stops (gares) et a son propre fare
-        // Utilisation de with() pour éviter le problème N+1
-        $trajets = DB::table('route')
-            ->join('etapes as etape_depart', function($join) use ($gareDepart) {
-                $join->on('route.id', '=', 'etape_depart.route_id')
-                     ->where('etape_depart.gare_id', '=', $gareDepart->id);
-            })
-            ->join('etapes as etape_arrivee', function($join) use ($gareArrivee) {
-                $join->on('route.id', '=', 'etape_arrivee.route_id')
-                     ->where('etape_arrivee.gare_id', '=', $gareArrivee->id);
-            })
-            ->join('programmes', 'route.id', '=', 'programmes.id_route')
-            ->join('segments', 'programmes.segment_id', '=', 'segments.id')
-            ->join('bus', 'segments.id_bus', '=', 'bus.id')
-            ->where('etape_depart.ordre', '<', 'etape_arrivee.ordre')
-            ->where('programmes.jour_depart', $dateDepart)
-            ->select(
-                'route.id as route_id',
-                'route.nom as route_nom',
-                'route.description',
-                'programmes.id as programme_id',
-                'programmes.heure_depart',
-                'programmes.heure_arrivee',
-                'segments.tarif as fare',
-                'segments.distance_km',
-                'segments.id as segment_id',
-                'bus.id as bus_id',
-                'bus.matricule',
-                'bus.capacite',
-                'etape_depart.heure_passage as heure_depart_stop',
-                'etape_arrivee.heure_passage as heure_arrivee_stop',
-                'etape_depart.gare_id as departure_stop_id',
-                'etape_arrivee.gare_id as arrival_stop_id'
-            )
-            ->distinct()
-            ->get();
+        \Illuminate\Support\Facades\Log::info("SEARCH STATIONS: Dep={$departureStation->id}, Arr={$arrivalStation->id}");
 
-        // Calculer les places disponibles et la durée pour chaque trajet
-        $trajets = $trajets->map(function($trajet) use ($nombreVoyageurs) {
-            // Compter les réservations existantes pour ce programme
-            $placesReservees = DB::table('reservation')
-                ->where('programme_id', $trajet->programme_id)
-                ->sum('nombre_places') ?? 0;
+        // Get stops for these stations
+        $departureStops = DB::table('stops')->where('station_id', $departureStation->id)->get();
+        $arrivalStops = DB::table('stops')->where('station_id', $arrivalStation->id)->get();
 
-            $placesDisponibles = $trajet->capacite - $placesReservees;
-            $trajet->places_disponibles = $placesDisponibles;
-            $trajet->peut_reserver = $placesDisponibles >= $nombreVoyageurs;
+        if ($departureStops->isEmpty() || $arrivalStops->isEmpty()) {
+            \Illuminate\Support\Facades\Log::info("SEARCH ERROR: No stops found for stations. Dep stops: " . $departureStops->count() . ", Arr stops: " . $arrivalStops->count());
+            return collect();
+        }
 
-            // Calculer la durée du trajet
-            $debut = Carbon::createFromFormat('H:i:s', $trajet->heure_depart_stop);
-            $fin = Carbon::createFromFormat('H:i:s', $trajet->heure_arrivee_stop);
-            $trajet->duree_minutes = $debut->diffInMinutes($fin);
+        $dateObj = Carbon::createFromFormat('Y-m-d', $dateDepart);
+        $dayOfWeek = strtolower($dateObj->format('l'));
 
-            return $trajet;
-        });
+        // Get all unique routes from departure stops
+        $routeIds = $departureStops->pluck('route_id')->unique();
+
+        $trajets = collect();
+
+        // For each route
+        foreach ($routeIds as $routeId) {
+            // Get all stops on this route in order
+            $stops = DB::table('stops')
+                ->where('route_id', $routeId)
+                ->orderBy('order')
+                ->get();
+
+            // Find departure and arrival stops on this route
+            $depStop = $departureStops->where('route_id', $routeId)->first();
+            $arrStop = $arrivalStops->where('route_id', $routeId)->first();
+
+            if (!$depStop || !$arrStop || $depStop->order >= $arrStop->order) {
+                continue; // Skip if not on same route or wrong order
+            }
+
+            // Get schedules for this route on this day
+            $schedules = DB::table('schedules')
+                ->where('route_id', $routeId)
+                ->where('day_of_week', $dayOfWeek)
+                ->where('active', true)
+                ->get();
+
+            // Get or create trips for this date
+            foreach ($schedules as $schedule) {
+                $trips = DB::table('trips')
+                    ->where('schedule_id', $schedule->id)
+                    ->where('departure_date', $dateDepart)
+                    ->where('status', '!=', 'cancelled')
+                    ->whereNotNull('bus_id')
+                    ->get();
+
+                foreach ($trips as $trip) {
+                    // Get fare for this segment (from departure stop to arrival stop)
+                    $segment = DB::table('segments')
+                        ->where('route_id', $routeId)
+                        ->where('departure_stop_id', $depStop->id)
+                        ->where('arrival_stop_id', $arrStop->id)
+                        ->first();
+
+                    // If direct segment doesn't exist, sum all segments in between
+                    if (!$segment) {
+                        // Find all intermediate segments
+                        $allSegments = DB::table('segments')
+                            ->where('route_id', $routeId)
+                            ->whereIn('departure_stop_id', $stops->where('order', '>=', $depStop->order)->where('order', '<', $arrStop->order)->pluck('id'))
+                            ->get();
+                        
+                        if ($allSegments->isEmpty()) {
+                            continue; // No segments found
+                        }
+                    } else {
+                        $allSegments = collect([$segment]);
+                    }
+
+                    // Get bus info
+                    $bus = DB::table('bus')->where('id', $trip->bus_id)->first();
+                    if (!$bus) continue;
+
+                    // Count existing bookings for this trip
+                    $placesReservees = DB::table('bookings')
+                        ->where('trip_id', $trip->id)
+                        ->count() ?? 0;
+
+                    $placesDisponibles = max(0, $bus->capacity - $placesReservees);
+
+                    // Calculate total fare from all segments
+                    $fare = 0;
+                    foreach ($allSegments as $seg) {
+                        $segFare = DB::table('fares')
+                            ->where('segment_id', $seg->id)
+                            ->where('bus_type', $bus->type ?? 'standard')
+                            ->where('active', true)
+                            ->latest('effective_from')
+                            ->value('price') ?? 0;
+                        $fare += $segFare;
+                    }
+
+                    // Get route info
+                    $route = DB::table('route')->where('id', $routeId)->first();
+
+                    $trajets->push((object)[
+                        'trip_id' => $trip->id,
+                        'schedule_id' => $schedule->id,
+                        'route_id' => $routeId,
+                        'departure_time' => $schedule->departure_time,
+                        'arrival_time' => $schedule->arrival_time,
+                        'segment_id' => $segment->id ?? null,
+                        'distance_km' => $allSegments->sum('distance_km') ?? 0,
+                        'bus_id' => $trip->bus_id,
+                        'departure_date' => $trip->departure_date,
+                        'places_disponibles' => $placesDisponibles,
+                        'peut_reserver' => $placesDisponibles >= $nombreVoyageurs,
+                        'fare' => $fare,
+                        'matricule' => $bus->registration_number ?? 'BUS-' . $trip->bus_id,
+                        'bus_name' => $bus->model ?? 'SATAS Bus',
+                        'bus_type' => $bus->type ?? 'standard',
+                        'route_nom' => $route->nom ?? 'Route ' . $routeId,
+                        'duree_minutes' => Carbon::createFromFormat('H:i:s', $schedule->departure_time)->diffInMinutes(Carbon::createFromFormat('H:i:s', $schedule->arrival_time)),
+                    ]);
+                }
+            }
+        }
 
         return $trajets;
     }
