@@ -19,6 +19,21 @@
         <!-- Login Card -->
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
             <div class="px-8 py-10">
+                @php
+                    $fromBooking = str_contains(session()->previousUrl() ?? '', 'booking') 
+                                  || str_contains(url()->previous() ?? '', 'search');
+                @endphp
+
+                @if($fromBooking || session('booking_redirect'))
+                <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
+                    <div class="text-blue-600 mt-0.5 text-lg"><i class="bi bi-ticket-perforated-fill"></i></div>
+                    <div>
+                        <p class="text-sm font-semibold text-blue-800">Finaliser votre réservation</p>
+                        <p class="text-xs text-blue-600 mt-0.5">Connectez-vous pour accéder à votre réservation.</p>
+                    </div>
+                </div>
+                @endif
+
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold text-slate-900">Bienvenue</h2>
                     <p class="text-slate-600 mt-1">Connectez-vous à votre compte</p>

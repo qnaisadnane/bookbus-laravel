@@ -97,5 +97,10 @@ Route::get('/debug-search', function() {
     }
 });
 
+// Dashboard route (utilisé après login/register)
+Route::get('/dashboard', function () {
+    return redirect()->route('home');
+})->middleware(['auth'])->name('dashboard');
+
 // Authentication routes
 require __DIR__.'/auth.php';

@@ -20,14 +20,29 @@
                 </div>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Accueil</a>
+                <div class="hidden md:flex space-x-6 items-center">
+                    <a href="{{ route('home') }}" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Accueil</a>
                     <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Nos Lignes</a>
-                    <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Agences</a>
                     <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors">Contact</a>
-                    <a href="#" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-200">
-                        Mon Compte
-                    </a>
+
+                    @auth
+                        <div class="flex items-center gap-3">
+                            <span class="text-slate-700 font-medium text-sm">
+                                <i class="bi bi-person-circle text-blue-600"></i> {{ Auth::user()->name }}
+                            </span>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="px-4 py-2 border border-slate-300 text-slate-600 text-sm font-medium rounded-lg hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all">
+                                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}" class="text-slate-600 hover:text-blue-600 font-medium transition-colors text-sm">Connexion</a>
+                        <a href="{{ route('register') }}" class="px-5 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-200 text-sm">
+                            S'inscrire
+                        </a>
+                    @endauth
                 </div>
 
                 <!-- Mobile Menu Button -->

@@ -30,9 +30,26 @@
                     </div>
                 </div>
 
-                <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline">
-                    Modifier la recherche
-                </a>
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline">
+                        Modifier la recherche
+                    </a>
+                    @auth
+                        <div class="flex items-center gap-2 border-l border-slate-200 pl-4">
+                            <span class="text-slate-600 text-sm"><i class="bi bi-person-circle text-blue-600"></i> {{ Auth::user()->name }}</span>
+                            <form method="POST" action="{{ route('logout') }}" class="inline">
+                                @csrf
+                                <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium">
+                                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium border-l border-slate-200 pl-4">
+                            <i class="bi bi-person"></i> Connexion
+                        </a>
+                    @endauth
+                </div>
             </div>
         </div>
     </div>

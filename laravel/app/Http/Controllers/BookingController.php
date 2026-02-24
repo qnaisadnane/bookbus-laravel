@@ -29,11 +29,27 @@ class BookingController extends Controller
         $segment = Segment::with(['departureStop.station', 'arrivalStop.station'])
             ->findOrFail($segmentId);
 
-        // Get fare for this segment and bus type
+        // Get fare for this segment and bus type (with fallback)
+        $busType = $trip->bus->type ?? 'standard';
         $fare = Fare::where('segment_id', $segmentId)
-            ->where('bus_type', $trip->bus->type)
+            ->where('bus_type', $busType)
             ->where('active', true)
             ->first();
+
+        // Fallback: try standard fare
+        if (!$fare) {
+            $fare = Fare::where('segment_id', $segmentId)
+                ->where('bus_type', 'standard')
+                ->where('active', true)
+                ->first();
+        }
+
+        // Last resort: any active fare for this segment
+        if (!$fare) {
+            $fare = Fare::where('segment_id', $segmentId)
+                ->where('active', true)
+                ->first();
+        }
 
         if (!$fare) {
             abort(404, 'Tarif non disponible pour ce trajet');
@@ -70,57 +86,65 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'trip_id' => 'required|exists:trips,id',
-            'segment_id' => 'required|exists:segments,id',
-            'passengers' => 'required|array|min:1',
-            'passengers.*.first_name' => 'required|string|max:255',
-            'passengers.*.last_name' => 'required|string|max:255',
-            'passengers.*.email' => 'required|email',
-            'passengers.*.phone' => 'required|string|max:20',
-            'passengers.*.id_document' => 'nullable|string|max:50',
-            'insurance' => 'nullable|in:none,partial,full',
-            'snackbox' => 'nullable|boolean',
-            'promo_code' => 'nullable|string|max:50',
+            'trip_id'                  => 'required|exists:trips,id',
+            'segment_id'               => 'required|exists:segments,id',
+            'passengers'               => 'required|array|min:1',
+            'passengers.*.first_name'  => 'required|string|max:255',
+            'passengers.*.last_name'   => 'required|string|max:255',
+            'passengers.*.email'       => 'required|email',
+            'passengers.*.phone'       => 'required|string|max:20',
         ]);
 
         $trip = Trip::findOrFail($validated['trip_id']);
         $segment = Segment::findOrFail($validated['segment_id']);
+        $busType = $trip->bus->type ?? 'standard';
         $fare = Fare::where('segment_id', $segment->id)
-            ->where('bus_type', $trip->bus->type)
+            ->where('bus_type', $busType)
             ->where('active', true)
-            ->firstOrFail();
+            ->first();
+
+        // Fallback to standard or any fare
+        if (!$fare) {
+            $fare = Fare::where('segment_id', $segment->id)
+                ->where('active', true)
+                ->first();
+        }
+
+        if (!$fare) {
+            abort(404, 'Tarif non disponible pour ce trajet');
+        }
 
         // Calculate price
         $segmentPrice = $fare->price;
         $totalPrice = $segmentPrice * count($validated['passengers']);
 
         $insurancePrice = 0;
-        $snackboxPrice = 0;
+        $snackboxPrice  = 0;
+        $discountAmount = 0;
+        $insurance      = $validated['insurance'] ?? 'none';
 
         // Add insurance if selected
-        if ($validated['insurance'] !== 'none') {
-            // SATAS insurance: 80% refund for 'partial', full refund for 'full'
-            $insurancePrice = match ($validated['insurance']) {
-                'partial' => $totalPrice * 0.05, // 5% for 80% coverage
-                'full' => $totalPrice * 0.08,    // 8% for full coverage
-                default => 0,
+        if ($insurance !== 'none') {
+            $insurancePrice = match ($insurance) {
+                'partial' => $totalPrice * 0.05,
+                'full'    => $totalPrice * 0.08,
+                default   => 0,
             };
             $totalPrice += $insurancePrice;
         }
 
         // Add snack box if selected (15 MAD per passenger)
-        if ($validated['snackbox'] ?? false) {
+        if ($request->boolean('snackbox')) {
             $snackboxPrice = 15 * count($validated['passengers']);
-            $totalPrice += $snackboxPrice;
+            $totalPrice   += $snackboxPrice;
         }
 
         // Apply promo code discount if provided
-        $discountAmount = 0;
-        if ($validated['promo_code']) {
-            $discount = $this->validatePromoCode($validated['promo_code']);
+        if ($request->filled('promo_code')) {
+            $discount = $this->validatePromoCode($request->promo_code);
             if ($discount) {
                 $discountAmount = $totalPrice * ($discount / 100);
-                $totalPrice -= $discountAmount;
+                $totalPrice    -= $discountAmount;
             }
         }
 

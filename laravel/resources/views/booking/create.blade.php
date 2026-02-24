@@ -81,56 +81,9 @@
                                     <input type="tel" name="passengers[{{ $i }}][phone]" required 
                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Document d'identité</label>
-                                    <input type="text" name="passengers[{{ $i }}][id_document]" 
-                                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                           placeholder="N° passeport, CIN...">
-                                </div>
                             </div>
                             @endfor
                         </div>
-                    </div>
-
-                    <!-- Options -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-bold mb-4">Options supplémentaires</h2>
-
-                        <!-- Insurance -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Assurance annulation</label>
-                            <div class="space-y-2">
-                                <label class="flex items-center">
-                                    <input type="radio" name="insurance" value="none" checked class="mr-2">
-                                    <span>Aucune</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="insurance" value="partial" class="mr-2">
-                                    <span>Partielle (80% remboursement) - 5% du prix</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="insurance" value="full" class="mr-2">
-                                    <span>Complète (100% remboursement) - 8% du prix</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Snack Box -->
-                        <div class="border-t pt-4">
-                            <label class="flex items-center">
-                                <input type="checkbox" name="snackbox" value="1" class="mr-2">
-                                <span class="font-medium">Snack-box SATAS</span>
-                                <span class="text-gray-600 ml-auto">+15 MAD</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Promo Code -->
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-bold mb-4">Code promotionnel</h2>
-                        <input type="text" name="promo_code" placeholder="Entrez votre code promo" 
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <p class="text-sm text-gray-500 mt-2">Codes valides: SATAS10, SATAS15, SATAS20, LOYALTY5</p>
                     </div>
 
                     <!-- Submit Button -->
