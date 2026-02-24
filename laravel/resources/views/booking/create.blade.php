@@ -54,36 +54,41 @@
 
                     <!-- Passengers -->
                     <div class="bg-white rounded-lg shadow p-6">
-                        <h2 class="text-xl font-bold mb-4">Passagers</h2>
+                        <h2 class="text-xl font-bold mb-4">Passagers ({{ $nombreVoyageurs }})</h2>
                         <div id="passengers-container" class="space-y-4">
-                            <div class="passenger-form space-y-3 pb-4 border-b">
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Prénom *</label>
-                                    <input type="text" name="passengers[0][first_name]" required 
-                                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium mb-1">Nom *</label>
-                                    <input type="text" name="passengers[0][last_name]" required 
-                                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            @for($i = 0; $i < $nombreVoyageurs; $i++)
+                            <div class="passenger-form space-y-3 pb-4 {{ $i < $nombreVoyageurs - 1 ? 'border-b' : '' }}">
+                                <h3 class="font-semibold text-blue-600 mb-3">Passager {{ $i + 1 }}</h3>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Prénom *</label>
+                                        <input type="text" name="passengers[{{ $i }}][first_name]" required 
+                                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Nom *</label>
+                                        <input type="text" name="passengers[{{ $i }}][last_name]" required 
+                                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    </div>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Email *</label>
-                                    <input type="email" name="passengers[0][email]" required 
+                                    <input type="email" name="passengers[{{ $i }}][email]" required 
                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Téléphone *</label>
-                                    <input type="tel" name="passengers[0][phone]" required 
+                                    <input type="tel" name="passengers[{{ $i }}][phone]" required 
                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">Document d'identité</label>
-                                    <input type="text" name="passengers[0][id_document]" 
+                                    <input type="text" name="passengers[{{ $i }}][id_document]" 
                                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                            placeholder="N° passeport, CIN...">
                                 </div>
                             </div>
+                            @endfor
                         </div>
                     </div>
 
@@ -142,8 +147,16 @@
                     
                     <div class="space-y-3 mb-6 pb-6 border-b">
                         <div class="flex justify-between">
-                            <span class="text-gray-600">Tarif segment</span>
+                            <span class="text-gray-600">Tarif par passager</span>
                             <span class="font-bold">{{ number_format($fare->price, 2) }} MAD</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Nombre de passagers</span>
+                            <span class="font-bold">{{ $nombreVoyageurs }}</span>
+                        </div>
+                        <div class="flex justify-between text-lg border-t pt-3">
+                            <span class="font-bold">Total</span>
+                            <span class="font-bold text-blue-600">{{ number_format($fare->price * $nombreVoyageurs, 2) }} MAD</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600">Places disponibles</span>

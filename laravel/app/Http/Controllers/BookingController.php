@@ -21,6 +21,7 @@ class BookingController extends Controller
     {
         $tripId = $request->trip_id;
         $segmentId = $request->segment_id;
+        $nombreVoyageurs = $request->nombre_voyageurs ?? 1;
 
         $trip = Trip::with(['schedule.route', 'bus', 'assignments.driver'])
             ->findOrFail($tripId);
@@ -49,11 +50,17 @@ class BookingController extends Controller
             return back()->with('error', 'Aucune place disponible pour ce trajet');
         }
 
+        // Verify we have enough seats for the requested number of passengers
+        if ($availableSeats < $nombreVoyageurs) {
+            return back()->with('error', "Seulement {$availableSeats} places disponibles pour ce trajet");
+        }
+
         return view('booking.create', compact(
             'trip',
             'segment',
             'fare',
-            'availableSeats'
+            'availableSeats',
+            'nombreVoyageurs'
         ));
     }
 

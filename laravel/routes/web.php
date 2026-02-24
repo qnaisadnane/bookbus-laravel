@@ -16,13 +16,15 @@ Route::get('/', [SearchController::class, 'index'])->name('home');
 // Search results
 Route::get('/search', [SearchController::class, 'search'])->name('search.results');
 
-// Booking routes
-Route::post('/booking/create', [BookingController::class, 'create'])->name('booking.create');
-Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
-Route::get('/booking/{booking}/confirmation', [BookingController::class, 'confirmation'])->name('booking.confirmation');
-Route::get('/booking/{booking}', [BookingController::class, 'show'])->name('booking.show');
-Route::post('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
-Route::get('/booking/seat-map', [BookingController::class, 'getSeatMap'])->name('booking.seatmap');
+// Booking routes - require authentication
+Route::middleware(['auth'])->group(function () {
+    Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
+    Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
+    Route::get('/booking/{booking}/confirmation', [BookingController::class, 'confirmation'])->name('booking.confirmation');
+    Route::get('/booking/{booking}', [BookingController::class, 'show'])->name('booking.show');
+    Route::post('/booking/{booking}/cancel', [BookingController::class, 'cancel'])->name('booking.cancel');
+    Route::get('/booking/seat-map', [BookingController::class, 'getSeatMap'])->name('booking.seatmap');
+});
 
 // ========== ADMIN ROUTES ==========
 
@@ -94,3 +96,6 @@ Route::get('/debug-search', function() {
         echo "Date: " . $t->jour_depart . "<br>";
     }
 });
+
+// Authentication routes
+require __DIR__.'/auth.php';

@@ -184,7 +184,7 @@ class SearchController extends Controller
                         ->where('arrival_stop_id', $arrStop->id)
                         ->first();
 
-                    // If direct segment doesn't exist, sum all segments in between
+                    // If direct segment doesn't exist, find all segments in between
                     if (!$segment) {
                         // Find all intermediate segments
                         $allSegments = DB::table('segments')
@@ -195,6 +195,9 @@ class SearchController extends Controller
                         if ($allSegments->isEmpty()) {
                             continue; // No segments found
                         }
+                        
+                        // Use the first segment for booking reference
+                        $segment = $allSegments->first();
                     } else {
                         $allSegments = collect([$segment]);
                     }
@@ -231,7 +234,7 @@ class SearchController extends Controller
                         'route_id' => $routeId,
                         'departure_time' => $schedule->departure_time,
                         'arrival_time' => $schedule->arrival_time,
-                        'segment_id' => $segment->id ?? null,
+                        'segment_id' => $segment->id, // Always has a value now
                         'distance_km' => $allSegments->sum('distance_km') ?? 0,
                         'bus_id' => $trip->bus_id,
                         'departure_date' => $trip->departure_date,

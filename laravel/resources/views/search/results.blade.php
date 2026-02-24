@@ -159,9 +159,14 @@
                                     </div>
                                     
                                     @if($trajet->peut_reserver)
-                                        <button class="w-full py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                                        <a href="{{ route('booking.create', [
+                                            'trip_id' => $trajet->trip_id,
+                                            'segment_id' => $trajet->segment_id,
+                                            'nombre_voyageurs' => $nombreVoyageurs
+                                        ]) }}" 
+                                           class="block w-full py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm text-center">
                                             Sélectionner
-                                        </button>
+                                        </a>
                                         <div class="text-xs text-green-600 mt-2 font-medium">
                                             {{ $trajet->places_disponibles }} places restantes
                                         </div>
